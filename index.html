@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pengumuman Nilai ASAS BIO Kelas X</title>
+
+<style>
+    body {
+        font-family: "Segoe UI", sans-serif;
+        background: #e8f5e9; /* hijau sangat lembut */
+        margin: 0;
+        padding: 0;
+        color: #2e4738;
+    }
+
+    .container {
+        max-width: 720px;
+        margin: 40px auto;
+        background: white;
+        padding: 25px;
+        border-radius: 18px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+        text-align: center;
+        color: #1b5e20;
+        margin-bottom: 20px;
+    }
+
+    .card {
+        background: #f1f8f5;
+        padding: 15px 20px;
+        border-radius: 12px;
+        margin-bottom: 15px;
+        border-left: 6px solid #66bb6a;
+    }
+
+    .nama {
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .kelas {
+        font-size: 14px;
+        opacity: .7;
+        margin-bottom: 8px;
+    }
+
+    .nilai {
+        font-size: 26px;
+        color: #2e7d32;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .catatan {
+        font-size: 14px;
+    }
+
+    .search {
+        width: 100%;
+        padding: 12px;
+        border-radius: 10px;
+        border: 1px solid #a5d6a7;
+        margin-bottom: 20px;
+    }
+</style>
+
+</head>
+<body>
+
+<div class="container">
+    <h1>Pengumuman Nilai ASAS BIO Kelas X</h1>
+    <input type="text" class="search" id="searchInput" placeholder="Cari nama atau kelas...">
+    <div id="result"></div>
+</div>
+
+<script>
+// GANTI LINK CSV DI SINI
+const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6TOBq3hEmeURsEAHVef1JuT-j-QrcRJels4akspwhkE4dVPn_Z5LQk5iKft01O1S9EUHtdvD1ssnn/pub?gid=0&single=true&output=csv";
+
+async function loadData() {
+    const response = await fetch(csvUrl);
+    const data = await response.text();
+    const rows = data.split("\n").map(r => r.split(","));
+
+    const header = rows.shift();
+    const resultDiv = document.getElementById("result");
+
+    function showResults(keyword="") {
+        resultDiv.innerHTML = "";
+        rows
+            .filter(r => r.join(" ").toLowerCase().includes(keyword.toLowerCase()))
+            .forEach(r => {
+                const [id, nama, kelas, nilai, catatan] = r;
+
+                const card = `
+                    <div class="card">
+                        <div class="nama">${nama}</div>
+                        <div class="kelas">${kelas}</div>
+                        <div class="nilai">${nilai}</div>
+                        <div class="catatan">${catatan}</div>
+                    </div>
+                `;
+                resultDiv.innerHTML += card;
+            });
+    }
+
+    showResults();
+
+    document.getElementById("searchInput").addEventListener("keyup", (e)=>{
+        showResults(e.target.value);
+    });
+}
+
+loadData();
+</script>
+
+</body>
+</html>
