@@ -3,69 +3,63 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pengumuman Nilai ASAS BIO Kelas X</title>
+<title>Pengumuman Nilai ASAS BIO</title>
 
 <style>
     body {
-        font-family: "Segoe UI", sans-serif;
-        background: #e8f5e9; /* hijau sangat lembut */
+        font-family: 'Segoe UI', sans-serif;
+        background: #e9f5ee;
         margin: 0;
         padding: 0;
-        color: #2e4738;
     }
-
     .container {
-        max-width: 720px;
-        margin: 40px auto;
+        max-width: 650px;
         background: white;
+        margin: 40px auto;
         padding: 25px;
-        border-radius: 18px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        border-radius: 15px;
+        box-shadow: 0 0 15px rgba(0,0,0,0.08);
     }
-
     h1 {
         text-align: center;
-        color: #1b5e20;
-        margin-bottom: 20px;
+        color: #1f6b3b;
+        margin-bottom: 25px;
     }
-
-    .card {
-        background: #f1f8f5;
-        padding: 15px 20px;
+    input {
+        width: 100%;
+        padding: 15px;
         border-radius: 12px;
-        margin-bottom: 15px;
-        border-left: 6px solid #66bb6a;
+        border: 2px solid #1f6b3b;
+        font-size: 16px;
+        margin-bottom: 25px;
+        outline: none;
     }
-
+    .card {
+        background: #f0faf4;
+        border-left: 8px solid #1f6b3b;
+        padding: 20px;
+        border-radius: 12px;
+        margin-top: 10px;
+    }
     .nama {
         font-size: 20px;
         font-weight: bold;
-        margin-bottom: 5px;
+        color: #1f6b3b;
     }
-
     .kelas {
         font-size: 14px;
-        opacity: .7;
-        margin-bottom: 8px;
+        color: #4a6b58;
     }
-
     .nilai {
-        font-size: 26px;
-        color: #2e7d32;
+        font-size: 32px;
         font-weight: bold;
-        margin-bottom: 5px;
+        margin: 10px 0;
+        color: #1f6b3b;
     }
-
     .catatan {
-        font-size: 14px;
-    }
-
-    .search {
-        width: 100%;
-        padding: 12px;
-        border-radius: 10px;
-        border: 1px solid #a5d6a7;
-        margin-bottom: 20px;
+        font-size: 15px;
+        color: #355944;
+        margin-top: 10px;
     }
 </style>
 
@@ -73,50 +67,55 @@
 <body>
 
 <div class="container">
-    <h1>Pengumuman Nilai ASAS BIO Kelas X</h1>
-    <input type="text" class="search" id="searchInput" placeholder="Cari nama atau kelas...">
+    <h1>Pengumuman Nilai ASAS BIO</h1>
+
+    <input type="text" id="searchID" placeholder="Masukkan ID (misal: X-E-325)">
+    
     <div id="result"></div>
 </div>
 
 <script>
-// GANTI LINK CSV DI SINI
-const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6TOBq3hEmeURsEAHVef1JuT-j-QrcRJels4akspwhkE4dVPn_Z5LQk5iKft01O1S9EUHtdvD1ssnn/pub?gid=0&single=true&output=csv";
+const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6TOBq3hEmeURsEAHVef1JuT-j-QrcRJels4akspwhkE4dVPn_Z5LQk5iKft01O1S9EUHtdvD1ssnn/pub?gid=0&single=true&output=csv";
 
 async function loadData() {
-    const response = await fetch(csvUrl);
+    const response = await fetch(sheetURL);
     const data = await response.text();
     const rows = data.split("\n").map(r => r.split(","));
-
-    const header = rows.shift();
-    const resultDiv = document.getElementById("result");
-
-    function showResults(keyword="") {
-        resultDiv.innerHTML = "";
-        rows
-            .filter(r => r.join(" ").toLowerCase().includes(keyword.toLowerCase()))
-            .forEach(r => {
-                const [id, nama, kelas, nilai, catatan] = r;
-
-                const card = `
-                    <div class="card">
-                        <div class="nama">${nama}</div>
-                        <div class="kelas">${kelas}</div>
-                        <div class="nilai">${nilai}</div>
-                        <div class="catatan">${catatan}</div>
-                    </div>
-                `;
-                resultDiv.innerHTML += card;
-            });
-    }
-
-    showResults();
-
-    document.getElementById("searchInput").addEventListener("keyup", (e)=>{
-        showResults(e.target.value);
-    });
+    return rows.slice(1); // skip header
 }
 
-loadData();
+document.getElementById("searchID").addEventListener("input", async function () {
+    const id = this.value.trim().toUpperCase();
+    const resultBox = document.getElementById("result");
+    
+    if (id.length < 3) {
+        resultBox.innerHTML = "";
+        return;
+    }
+
+    const data = await loadData();
+    
+    const found = data.find(row => row[0].trim().toUpperCase() === id);
+    
+    if (!found) {
+        resultBox.innerHTML = "<p>ID tidak ditemukan.</p>";
+        return;
+    }
+
+    const nama = found[1];
+    const kelas = found[2];
+    const nilai = found[3];
+    const catatan = found[4];
+
+    resultBox.innerHTML = `
+        <div class="card">
+            <div class="nama">${nama}</div>
+            <div class="kelas">${kelas}</div>
+            <div class="nilai">${nilai}</div>
+            <div class="catatan">${catatan}</div>
+        </div>
+    `;
+});
 </script>
 
 </body>
